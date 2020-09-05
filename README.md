@@ -2,6 +2,8 @@
 
 Multi user board that lets you create art with others.
 
+hosted: https://themap-45fad.web.app/
+
 ## Project setup
 ```
 npm install
