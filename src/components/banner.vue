@@ -1,6 +1,6 @@
 <template>
     <div class = "banner">
-        MAP.IO
+        MAP.io
     </div>
 </template>
 <script>

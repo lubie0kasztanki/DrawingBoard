@@ -1,12 +1,20 @@
 <template>
-    <div>
+    <div  v-if="isMobile" class = "BBMobile">
+        <div class = "board">
+            <canvas @mouseup="mouseUP" @mousemove="movedOnBoard" @mousedown="mouseDOWN" ref="mainBoard" width="self.width-30" height="self.width-30"></canvas>
+        </div>
+        <div class = "button" @click="submit">
+            Submit
+        </div>
+    </div>   
+    <div v-else class = "BB">
         <div class = "board">
             <canvas @mouseup="mouseUP" @mousemove="movedOnBoard" @mousedown="mouseDOWN" ref="mainBoard" width="600" height="600"></canvas>
         </div>
         <div class = "button" @click="submit">
             Submit
         </div>
-    </div>   
+    </div> 
 </template>
 
 <script>
@@ -14,15 +22,13 @@ export default {
     name: "Board",
     data() {
         return {
-            width: 600,
-            height: 600,
             gridNum: 20,
             tiles: [],
             mousePressed: false,
             currentElementType: 1
         }
     },
-    props: ["initTiles"],
+    props: ["initTiles", "width", "height"],
     methods: {
         submit() {
             this.$emit('board-send', this.tiles);
@@ -128,6 +134,12 @@ export default {
   background: #000000;
   color: white;
   font-size: 30px;
+}
+.BBMobile{
+    height: 80%;
+}
+.BB{
+    height: 100%;
 }
 
 </style>

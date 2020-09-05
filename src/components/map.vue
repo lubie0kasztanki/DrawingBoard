@@ -1,7 +1,10 @@
 <template>
-    <div class = "mainMap">
-        <canvas @click="clickedOnTile" @mousemove="hover" ref="mainMap" width="600" height="600"></canvas>
+    <div v-if="isMobile" class = "mainMap">
+        <canvas @click="clickedOnTile" @mousemove="hover" ref="mainMap" width="screen.width-30" height="screen.width-30"></canvas>
     </div>    
+    <div v-else class = "mainMap">
+        <canvas @click="clickedOnTile" @mousemove="hover" ref="mainMap" width="600" height="600"></canvas>
+    </div> 
 </template>
 <script>
 export default {
@@ -9,12 +12,11 @@ export default {
     data(){
         return{
             tilesTables: [],
-            height: 600,
-            width: 600,
             gridNum: 10,
+            tileSize: 0,
         }
     },
-    props: ["rawTilesTable", "ready"],
+    props: ["rawTilesTable", "ready", "height", "width"],
     methods: {
         clickedOnTile(click) {
             if (this.ready) this.$emit("map-selected", click);
@@ -26,11 +28,14 @@ export default {
             this.drawGrid();
             var board = this.$refs["mainMap"];
             var c = board.getContext("2d");
-            var x = Math.floor(pos.offsetX/60) * 60;
-            var y = Math.floor(pos.offsetY/60) * 60;
+            var x = Math.floor(pos.offsetX/this.tileSize) * this.tileSize;
+            var y = Math.floor(pos.offsetY/this.tileSize) * this.tileSize;
             c.fillStyle = 'rgba(200,200,200,0.5)';
             console.log(x,y);
-            c.fillRect(x,y,60,60);
+            if (x < this.gridNum * this.tileSize && y < this.gridNum * this.tileSize){
+                c.fillRect(x,y,this.tileSize,this.tileSize);
+            }
+            
         },
         extractFromRawTiles() {
             this.tilesTables = [];
@@ -51,12 +56,12 @@ export default {
         drawPixels(){
             var board = this.$refs["mainMap"];
             var c = board.getContext("2d");
-            for (var i = 0; i < 10; i++){
-                for (var j = 0; j < 10; j++){
+            for (var i = 0; i < this.gridNum; i++){
+                for (var j = 0; j < this.gridNum; j++){
                     for (var k = 0; k < 20; k++){
                         for (var l = 0; l < 20; l++){
-                            var x = j * 60 + l * 3;
-                            var y = i * 60 + k * 3;
+                            var x = j * this.tileSize + l * (this.tileSize/20);
+                            var y = i * this.tileSize + k * (this.tileSize/20);
                             if (this.tilesTables[i][j][k][l] == 1){
                                 c.fillStyle = "#000000";
                                 c.fillRect(x,y,3,3);
@@ -85,8 +90,10 @@ export default {
         },
     },
     mounted() {
+        this.tileSize = this.height/this.gridNum
         console.log("mounted map", this.ready);
         if (this.ready){
+            
             this.extractFromRawTiles();
             this.drawPixels();
             this.drawGrid();

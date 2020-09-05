@@ -2,8 +2,8 @@
 
   <div id="app">
     <Banner />
-    <Board v-bind:initTiles="workingTiles" v-on:board-send="submitBoard" v-if="inBoardSection" />
-    <Map v-bind:ready="mapReady" v-on:map-selected="selected" ref = "map" v-bind:rawTilesTable="rawTilesTable" v-if="!inBoardSection" />
+    <Board v-bind:width="width" v-bind:height="height" v-bind:initTiles="workingTiles" v-on:board-send="submitBoard" v-if="inBoardSection" />
+    <Map v-bind:height="height" v-bind:width="width" v-bind:ready="mapReady" v-on:map-selected="selected" ref = "map" v-bind:rawTilesTable="rawTilesTable" v-if="!inBoardSection" />
   </div>
 
 </template>
@@ -16,11 +16,13 @@ import Map from './components/map';
 import * as firebase from "firebase/app";
 import "firebase/firestore";
 import cridentials from "../firebase_cridentials/firebase_cridentials.json"
+import { isMobile } from 'mobile-device-detect';
 
 
 var firebaseConfig = cridentials
 
 firebase.initializeApp(firebaseConfig);
+
 
 export default {
   name: 'App',
@@ -37,7 +39,10 @@ export default {
       currentChoice: [],
       dbObserver: null,
       mapReady: false,
-      workingTiles: []
+      workingTiles: [],
+      height:600,
+      width: 600,
+      tileSize: 60
     }
   },
   methods: {
@@ -58,8 +63,8 @@ export default {
         this.inBoardSection = false;
     },
     selected(pos) {
-      var i = Math.floor(pos.offsetY/60);
-      var j = Math.floor(pos.offsetX/60);
+      var i = Math.floor(pos.offsetY/this.tileSize);
+      var j = Math.floor(pos.offsetX/this.tileSize);
       this.currentChoice = [];
       this.currentChoice.push(i);
       this.currentChoice.push(j);
@@ -79,6 +84,17 @@ export default {
       else return false;
     }
   },
+  created(){
+    if (isMobile){
+      console.log("mobile detected")
+      this.tileSize = (screen.width - 30)/10;
+      this.height = screen.width - 30;
+      this.width = screen.width - 30;
+    }
+    else{
+      console.log("mobile not detected")
+    }
+  },
   mounted(){
     // var t = [];
     // for (var z = 0; z < 20; z ++){
@@ -96,7 +112,7 @@ export default {
     //     this.submitBoard(t);
     //   }
     // }
-
+  
     var db = firebase.firestore();
     let tilesRef = db.collection('mapTiles');
 
