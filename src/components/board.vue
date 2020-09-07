@@ -1,20 +1,12 @@
 <template>
-    <div  v-if="isMobile" class = "BBMobile">
+    <div class = "BB">
         <div class = "board">
-            <canvas @mouseup="mouseUP" @mousemove="movedOnBoard" @mousedown="mouseDOWN" ref="mainBoard" width="self.width-30" height="self.width-30"></canvas>
+            <canvas class = "canvas" @mouseup="mouseUP" @mousemove="movedOnBoard" @mousedown="mouseDOWN" ref="mainBoard" v-bind:width="this.width" v-bind:height="this.width"></canvas>
         </div>
         <div class = "button" @click="submit">
             Submit
         </div>
     </div>   
-    <div v-else class = "BB">
-        <div class = "board">
-            <canvas @mouseup="mouseUP" @mousemove="movedOnBoard" @mousedown="mouseDOWN" ref="mainBoard" width="600" height="600"></canvas>
-        </div>
-        <div class = "button" @click="submit">
-            Submit
-        </div>
-    </div> 
 </template>
 
 <script>
@@ -37,7 +29,7 @@ export default {
             if (!this.mousePressed) return;
             var x = click.offsetX;
             var y = click.offsetY;
-            var i = Math.floor(y/(this.height/this.gridNum));
+            var i = Math.floor(y/(this.width/this.gridNum));
             var j = Math.floor(x/(this.width/this.gridNum));
             if (!this.tiles[i][j][1]){
                 if (this.tiles[i][j][0] == 0)
@@ -51,7 +43,7 @@ export default {
             this.mousePressed = true;
             var x = click.offsetX;
             var y = click.offsetY;
-            var i = Math.floor(y/(this.height/this.gridNum));
+            var i = Math.floor(y/(this.width/this.gridNum));
             var j = Math.floor(x/(this.width/this.gridNum));
             if (!this.tiles[i][j][1]){
                 this.tiles[i][j][0] = !this.tiles[i][j][0];
@@ -62,7 +54,7 @@ export default {
         drawTiles(){
             var board = this.$refs["mainBoard"];
             var c = board.getContext("2d");
-            var size = this.height/this.gridNum;
+            var size = (this.width/this.gridNum);
             for (var i = 0; i < this.gridNum; i++){
                 for (var j = 0; j < this.gridNum; j++){
                     var x = j*size;
@@ -73,7 +65,7 @@ export default {
                     else {
                         c.fillStyle = "#000000";
                     }
-                    c.fillRect(x, y, size, size);
+                    c.fillRect(x, y, Math.ceil(size), Math.ceil(size));
                     c.stroke();
                 }
             }
@@ -93,9 +85,23 @@ export default {
                 this.tiles[i][j][0] = this.initTiles[index];
             }
             this.drawTiles();
+            this.drawGrid();
         },
+        drawGrid(){
+        var board = this.$refs["mainBoard"];
+        var c = board.getContext("2d");
+        c.fillStyle = "#000000";
+        for (var x = 0; x <= this.width; x += (this.width/this.gridNum)){
+            c.moveTo(x, 0);
+            c.lineTo(x, this.width);
+        }
+        for (var y= 0; y <= this.width; y += (this.width/this.gridNum)){
+            c.moveTo(0, y);
+            c.lineTo(this.width, y);
+        }
+        c.stroke();
     },
-
+    },
     mounted() {
         for (var i = 0; i < this.gridNum; i++) {
             var row = []
@@ -105,41 +111,27 @@ export default {
             this.tiles.push(row);
         }
         this.initWithTiles();
-        var board = this.$refs["mainBoard"];
-        var c = board.getContext("2d");
-        for (var x = 0; x <= this.width; x += (this.width/this.gridNum)){
-            c.moveTo(x, 0);
-            c.lineTo(x, this.height);
-        }
-        for (var y= 0; y <= this.height; y += (this.height/this.gridNum)){
-            c.moveTo(0, y);
-            c.lineTo(this.width, y);
-        }
-        c.stroke();
     }
 }
 </script>
 
 <style>
 .board {
-  padding: 15px;
+  padding-top: 15px;
+  padding-bottom: 15px;
   text-align: center;
   background: #226356;
   color: white;
   font-size: 30px;
+  height: auto;
+  align-self: center;
 }
 .button {
   padding: 15px;
   text-align: center;
   background: #000000;
   color: white;
+  height: auto;
   font-size: 30px;
 }
-.BBMobile{
-    height: 80%;
-}
-.BB{
-    height: 100%;
-}
-
 </style>

@@ -2,8 +2,8 @@
 
   <div id="app">
     <Banner />
-    <Board v-bind:width="width" v-bind:height="height" v-bind:initTiles="workingTiles" v-on:board-send="submitBoard" v-if="inBoardSection" />
-    <Map v-bind:height="height" v-bind:width="width" v-bind:ready="mapReady" v-on:map-selected="selected" ref = "map" v-bind:rawTilesTable="rawTilesTable" v-if="!inBoardSection" />
+    <Board v-bind:width="board_width" v-bind:initTiles="workingTiles" v-on:board-send="submitBoard" v-if="inBoardSection" />
+    <Map v-bind:width="board_width" v-bind:ready="mapReady" v-on:map-selected="selected" ref = "map" v-bind:rawTilesTable="rawTilesTable" v-if="!inBoardSection" />
   </div>
 
 </template>
@@ -40,8 +40,7 @@ export default {
       dbObserver: null,
       mapReady: false,
       workingTiles: [],
-      height:600,
-      width: 600,
+      board_width: 600,
       tileSize: 60
     }
   },
@@ -86,16 +85,23 @@ export default {
   },
   created(){
     if (isMobile){
-      console.log("mobile detected")
-      this.tileSize = (screen.width - 30)/10;
-      this.height = screen.width - 30;
-      this.width = screen.width - 30;
-    }
-    else{
-      console.log("mobile not detected")
+      this.tileSize = Math.ceil((screen.width * 0.92)/10);
+      this.board_width = Math.ceil(screen.width * 0.92);
     }
   },
+  onRotate(){
+    console.log("resized");
+    if (isMobile){
+      this.tileSize = Math.ceil((screen.width * 0.92)/10);
+      this.board_width = Math.ceil(screen.width * 0.92);
+    }
+    this.$refs["map"].drawPixels();
+    this.$refs["map"].drawGrid();
+  },
   mounted(){
+
+    // code used to fill the database
+
     // var t = [];
     // for (var z = 0; z < 20; z ++){
     //   var helper = [];
@@ -112,6 +118,10 @@ export default {
     //     this.submitBoard(t);
     //   }
     // }
+    
+    this.$nextTick(() => {
+      window.addEventListener('resize', this.onResize);
+    })
   
     var db = firebase.firestore();
     let tilesRef = db.collection('mapTiles');
@@ -145,7 +155,15 @@ export default {
   color: #2c3e50;
   margin-top: 0px;
 }
-body{
-  margin: 0px;
+
+@media screen and (max-width: 480px) {
+    html, body{
+      margin: 0px;
+      align-self: center;
+      max-width: 100vw;
+      overflow-x: hidden;
+      height: 100vh;
+      background-color: #226356;
+}
 }
 </style>

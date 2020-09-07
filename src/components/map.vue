@@ -1,10 +1,7 @@
 <template>
-    <div v-if="isMobile" class = "mainMap">
-        <canvas @click="clickedOnTile" @mousemove="hover" ref="mainMap" width="screen.width-30" height="screen.width-30"></canvas>
-    </div>    
-    <div v-else class = "mainMap">
-        <canvas @click="clickedOnTile" @mousemove="hover" ref="mainMap" width="600" height="600"></canvas>
-    </div> 
+    <div class = "mainMap">
+        <canvas class = "canvas" @click="clickedOnTile" @mousemove="hover" ref="mainMap" v-bind:width="this.width" v-bind:height="this.width"></canvas>
+    </div>   
 </template>
 <script>
 export default {
@@ -16,7 +13,7 @@ export default {
             tileSize: 0,
         }
     },
-    props: ["rawTilesTable", "ready", "height", "width"],
+    props: ["rawTilesTable", "ready", "width"],
     methods: {
         clickedOnTile(click) {
             if (this.ready) this.$emit("map-selected", click);
@@ -54,8 +51,12 @@ export default {
             }
         },
         drawPixels(){
+            this.tileSize = (this.width / 10);
             var board = this.$refs["mainMap"];
             var c = board.getContext("2d");
+            var pixelSize = Math.ceil(this.tileSize/20)
+            c.fillStyle = "#FFFFFF";
+            c.fillRect(0,0,this.width, this.width);
             for (var i = 0; i < this.gridNum; i++){
                 for (var j = 0; j < this.gridNum; j++){
                     for (var k = 0; k < 20; k++){
@@ -64,11 +65,11 @@ export default {
                             var y = i * this.tileSize + k * (this.tileSize/20);
                             if (this.tilesTables[i][j][k][l] == 1){
                                 c.fillStyle = "#000000";
-                                c.fillRect(x,y,3,3);
+                                c.fillRect(x,y,pixelSize,pixelSize);
                             } 
                             else {
                                 c.fillStyle = "#FFFFFF";
-                                c.fillRect(x,y,3,3);
+                                c.fillRect(x,y,pixelSize,pixelSize);
                             }
                         }
                     }
@@ -76,21 +77,21 @@ export default {
             }
         },
         drawGrid(){
-        var board = this.$refs["mainMap"];
-        var c = board.getContext("2d");
-        for (var x = 0; x <= this.width; x += (this.width/this.gridNum)){
-            c.moveTo(x, 0);
-            c.lineTo(x, this.height);
-        }
-        for (var y= 0; y <= this.height; y += (this.height/this.gridNum)){
-            c.moveTo(0, y);
-            c.lineTo(this.width, y);
-        }
-        c.stroke();
+            var board = this.$refs["mainMap"];
+            var c = board.getContext("2d");
+            for (var x = 0; x <= this.width; x += (this.width/this.gridNum)){
+                c.moveTo(x, 0);
+                c.lineTo(x, this.width);
+            }
+            for (var y= 0; y <= this.width; y += (this.width/this.gridNum)){
+                c.moveTo(0, y);
+                c.lineTo(this.width, y);
+            }
+            c.stroke();
         },
     },
     mounted() {
-        this.tileSize = this.height/this.gridNum
+        this.tileSize = this.width/this.gridNum
         console.log("mounted map", this.ready);
         if (this.ready){
             
@@ -103,11 +104,11 @@ export default {
 </script>
 <style>
 .mainMap {
-  padding: 15px;
+  padding-top: 15px;
+  padding-bottom: 15px;
   text-align: center;
   background: #226356;
   color: white;
   font-size: 30px;
 }
-
 </style>
