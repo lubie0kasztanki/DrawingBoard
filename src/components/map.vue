@@ -51,7 +51,8 @@ export default {
             }
         },
         drawPixels(){
-            this.tileSize = (this.width / 10);
+            this.tileSize = this.width/this.gridNum
+            console.log("drawing pixels");
             var board = this.$refs["mainMap"];
             var c = board.getContext("2d");
             var pixelSize = Math.ceil(this.tileSize/20)
@@ -91,10 +92,7 @@ export default {
         },
     },
     mounted() {
-        this.tileSize = this.width/this.gridNum
-        console.log("mounted map", this.ready);
-        if (this.ready){
-            
+        if (this.ready){  
             this.extractFromRawTiles();
             this.drawPixels();
             this.drawGrid();

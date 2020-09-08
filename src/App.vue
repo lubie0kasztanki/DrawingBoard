@@ -2,7 +2,7 @@
 
   <div id="app">
     <Banner />
-    <Board v-bind:width="board_width" v-bind:initTiles="workingTiles" v-on:board-send="submitBoard" v-if="inBoardSection" />
+    <Board v-bind:width="board_width" v-bind:initTiles="workingTiles" v-on:board-send="submitBoard" ref = "board" v-if="inBoardSection" />
     <Map v-bind:width="board_width" v-bind:ready="mapReady" v-on:map-selected="selected" ref = "map" v-bind:rawTilesTable="rawTilesTable" v-if="!inBoardSection" />
   </div>
 
@@ -81,22 +81,32 @@ export default {
       var translatedIndex = this.currentChoice[0]*10 + this.currentChoice[1];
       if (!this.tileLocks[translatedIndex]) return true;
       else return false;
-    }
+    },
+    screenRotated(){
+       console.log("resized");
+      if (isMobile){
+        this.tileSize = Math.ceil((screen.width * 0.92)/10);
+        this.board_width = Math.ceil(screen.width * 0.92);
+      }
+      if (this.mapReady && !this.inBoardSection){
+        this.$nextTick(function (){
+          this.$refs["map"].drawPixels();
+          this.$refs["map"].drawGrid();
+        });
+      }
+      else if(this.inBoardSection){
+        this.$nextTick(function (){
+          this.$refs["board"].drawTiles();
+          this.$refs["board"].drawGrid();
+        });
+      }
+     },
   },
   created(){
     if (isMobile){
       this.tileSize = Math.ceil((screen.width * 0.92)/10);
       this.board_width = Math.ceil(screen.width * 0.92);
     }
-  },
-  onRotate(){
-    console.log("resized");
-    if (isMobile){
-      this.tileSize = Math.ceil((screen.width * 0.92)/10);
-      this.board_width = Math.ceil(screen.width * 0.92);
-    }
-    this.$refs["map"].drawPixels();
-    this.$refs["map"].drawGrid();
   },
   mounted(){
 
@@ -119,10 +129,8 @@ export default {
     //   }
     // }
     
-    this.$nextTick(() => {
-      window.addEventListener('resize', this.onResize);
-    })
-  
+    screen.orientation.onchange = this.screenRotated;
+
     var db = firebase.firestore();
     let tilesRef = db.collection('mapTiles');
 
@@ -162,8 +170,9 @@ export default {
       align-self: center;
       max-width: 100vw;
       overflow-x: hidden;
+      overflow-y: hidden;
       height: 100vh;
       background-color: #226356;
-}
+  }
 }
 </style>

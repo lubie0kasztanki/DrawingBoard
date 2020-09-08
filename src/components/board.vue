@@ -20,7 +20,7 @@ export default {
             currentElementType: 1
         }
     },
-    props: ["initTiles", "width", "height"],
+    props: ["initTiles", "width"],
     methods: {
         submit() {
             this.$emit('board-send', this.tiles);
@@ -51,25 +51,6 @@ export default {
             }
             this.drawTiles();
         },
-        drawTiles(){
-            var board = this.$refs["mainBoard"];
-            var c = board.getContext("2d");
-            var size = (this.width/this.gridNum);
-            for (var i = 0; i < this.gridNum; i++){
-                for (var j = 0; j < this.gridNum; j++){
-                    var x = j*size;
-                    var y = i*size;
-                    if (this.tiles[i][j][0] == 0){
-                        c.fillStyle = "#FFFFFF";
-                    }
-                    else {
-                        c.fillStyle = "#000000";
-                    }
-                    c.fillRect(x, y, Math.ceil(size), Math.ceil(size));
-                    c.stroke();
-                }
-            }
-        },
         mouseUP() {
             this.mousePressed = false;
             for (var i = 0; i < this.gridNum; i++){
@@ -87,20 +68,39 @@ export default {
             this.drawTiles();
             this.drawGrid();
         },
+        drawTiles(){
+            var board = this.$refs["mainBoard"];
+            var c = board.getContext("2d");
+            var size = (this.width/this.gridNum); // tile size
+            for (var i = 0; i < this.gridNum; i++){
+                for (var j = 0; j < this.gridNum; j++){
+                    var x = j*size;
+                    var y = i*size;
+                    if (this.tiles[i][j][0] == 0){
+                        c.fillStyle = "#FFFFFF";
+                    }
+                    else {
+                        c.fillStyle = "#000000";
+                    }
+                    c.fillRect(x, y, Math.ceil(size), Math.ceil(size));
+                    c.stroke();
+                }
+            }
+        },
         drawGrid(){
-        var board = this.$refs["mainBoard"];
-        var c = board.getContext("2d");
-        c.fillStyle = "#000000";
-        for (var x = 0; x <= this.width; x += (this.width/this.gridNum)){
-            c.moveTo(x, 0);
-            c.lineTo(x, this.width);
-        }
-        for (var y= 0; y <= this.width; y += (this.width/this.gridNum)){
-            c.moveTo(0, y);
-            c.lineTo(this.width, y);
-        }
-        c.stroke();
-    },
+            var board = this.$refs["mainBoard"];
+            var c = board.getContext("2d");
+            c.fillStyle = "#000000";
+            for (var x = 0; x <= this.width; x += (this.width/this.gridNum)){
+                c.moveTo(x, 0);
+                c.lineTo(x, this.width);
+            }
+            for (var y= 0; y <= this.width; y += (this.width/this.gridNum)){
+                c.moveTo(0, y);
+                c.lineTo(this.width, y);
+            }
+            c.stroke();
+        },
     },
     mounted() {
         for (var i = 0; i < this.gridNum; i++) {
@@ -133,5 +133,18 @@ export default {
   color: white;
   height: auto;
   font-size: 30px;
+}
+@media screen and (max-width: 480px) {
+    .BB{
+        height: 100%;
+    }
+    .button{
+        position: absolute;
+        text-align: center;
+        bottom: 0%;
+        padding-left: 0;
+        width: 100%;
+    }
+
 }
 </style>
