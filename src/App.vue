@@ -128,8 +128,10 @@ export default {
     //     this.submitBoard(t);
     //   }
     // }
-    
-    screen.orientation.onchange = this.screenRotated;
+    this.$nextTick(function(){
+     // screen.orientation.onchange = this.screenRotated;
+     window.addEventListener("orientationchange", this.screenRotated);
+    });
 
     var db = firebase.firestore();
     let tilesRef = db.collection('mapTiles');
